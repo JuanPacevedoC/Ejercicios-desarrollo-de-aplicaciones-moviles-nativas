@@ -1,0 +1,23 @@
+<resources>
+    <string name="app_name">FitMarket Calisthenics</string>
+    <string name="app_slogan">Tienda deportiva de fuerza y calistenia</string>
+    <string name="currency_format">$ %,d COP</string>
+
+    <!-- Roles -->
+    <string name="role_admin">Administrador</string>
+    <string name="role_vendor">Vendedor</string>
+    <string name="role_buyer">Comprador</string>
+
+    <!-- Nav Items -->
+    <string name="nav_home">Inicio</string>
+    <string name="nav_catalog">Catálogo</string>
+    <string name="nav_cart">Carrito</string>
+    <string name="nav_profile">Perfil</string>
+    <string name="nav_dashboard">Dashboard</string>
+    <string name="nav_users">Usuarios</string>
+    <string name="nav_products">Productos</string>
+    <string name="nav_reports">Reportes</string>
+    <string name="nav_orders">Pedidos</string>
+    <string name="nav_store">Mi Tienda</string>
+    <string name="nav_logout">Cerrar Sesión</string>
+</resources>

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Brand Colors - FitMarket Calisthenics -->
+    <color name="primary">#FF6D00</color>
+    <color name="primaryVariant">#E65100</color>
+    <color name="primaryDark">#BF360C</color>
+    <color name="secondary">#00897B</color>
+    <color name="secondaryVariant">#004D40</color>
+    <color name="accent">#FFAB00</color>
+
+    <!-- Neutral & Background -->
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="background">#F8F9FA</color>
+    <color name="surface">#FFFFFF</color>
+    <color name="surfaceVariant">#F1F3F5</color>
+    <color name="cardBackground">#FFFFFF</color>
+    <color name="cardBorder">#E2E8F0</color>
+
+    <!-- Text Colors -->
+    <color name="textPrimary">#1E293B</color>
+    <color name="textSecondary">#64748B</color>
+    <color name="textMuted">#94A3B8</color>
+    <color name="textOnPrimary">#FFFFFF</color>
+
+    <!-- Semantic / Status -->
+    <color name="statusPending">#ED6C02</color>
+    <color name="statusProcessing">#0288D1</color>
+    <color name="statusShipped">#7B1FA2</color>
+    <color name="statusDelivered">#2E7D32</color>
+    <color name="statusCancelled">#D32F2F</color>
+
+    <!-- Role Colors -->
+    <color name="roleAdmin">#7C3AED</color>
+    <color name="roleAdminLight">#EDE9FE</color>
+    <color name="roleVendor">#0284C7</color>
+    <color name="roleVendorLight">#E0F2FE</color>
+    <color name="roleBuyer">#16A34A</color>
+    <color name="roleBuyerLight">#DCFCE7</color>
+</resources>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/menu_vendor_products"
+        android:icon="@drawable/ic_inventory"
+        android:title="Productos" />
+    <item
+        android:id="@+id/menu_vendor_orders"
+        android:icon="@drawable/ic_receipt_long"
+        android:title="Pedidos" />
+    <item
+        android:id="@+id/menu_vendor_profile"
+        android:icon="@drawable/ic_store"
+        android:title="Mi Tienda" />
+</menu>

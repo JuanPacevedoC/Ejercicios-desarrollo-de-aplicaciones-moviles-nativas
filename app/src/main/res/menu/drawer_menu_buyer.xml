@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/drawer_buyer_home"
+            android:icon="@drawable/ic_home"
+            android:title="Inicio" />
+        <item
+            android:id="@+id/drawer_buyer_catalog"
+            android:icon="@drawable/ic_shopping_bag"
+            android:title="Catálogo Deportivo" />
+        <item
+            android:id="@+id/drawer_buyer_cart"
+            android:icon="@drawable/ic_shopping_cart"
+            android:title="Mi Carrito" />
+        <item
+            android:id="@+id/drawer_buyer_orders"
+            android:icon="@drawable/ic_receipt_long"
+            android:title="Mis Compras" />
+        <item
+            android:id="@+id/drawer_buyer_profile"
+            android:icon="@drawable/ic_person"
+            android:title="Mi Perfil" />
+    </group>
+
+    <item android:title="Demostración y Sesión">
+        <menu>
+            <item
+                android:id="@+id/drawer_switch_role"
+                android:icon="@drawable/ic_swap_horiz"
+                android:title="Cambiar de Rol" />
+            <item
+                android:id="@+id/drawer_logout"
+                android:icon="@drawable/ic_logout"
+                android:title="Cerrar Sesión" />
+        </menu>
+    </item>
+</menu>

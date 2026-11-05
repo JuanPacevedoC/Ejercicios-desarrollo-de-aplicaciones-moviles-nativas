@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/drawer_vendor_products"
+            android:icon="@drawable/ic_inventory"
+            android:title="Panel de Productos" />
+        <item
+            android:id="@+id/drawer_vendor_orders"
+            android:icon="@drawable/ic_receipt_long"
+            android:title="Historial de Pedidos" />
+        <item
+            android:id="@+id/drawer_vendor_profile"
+            android:icon="@drawable/ic_store"
+            android:title="Perfil de Vendedor" />
+    </group>
+
+    <item android:title="Demostración y Sesión">
+        <menu>
+            <item
+                android:id="@+id/drawer_switch_role"
+                android:icon="@drawable/ic_swap_horiz"
+                android:title="Cambiar de Rol" />
+            <item
+                android:id="@+id/drawer_logout"
+                android:icon="@drawable/ic_logout"
+                android:title="Cerrar Sesión" />
+        </menu>
+    </item>
+</menu>
