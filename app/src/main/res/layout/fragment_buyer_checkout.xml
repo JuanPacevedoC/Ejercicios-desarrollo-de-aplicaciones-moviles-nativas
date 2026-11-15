@@ -94,22 +94,41 @@
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- Shipping Address -->
+        <!-- Shipping Address & GPS Location -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
-            android:text="Dirección de Envío"
+            android:text="Dirección de Envío y Geolocalización"
             android:textColor="@color/textPrimary"
             android:textSize="15sp"
             android:textStyle="bold" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnGetLocation"
+            style="@style/Widget.FitMarket.Button.Outlined"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="📍 Capturar Mi Ubicación GPS Actual"
+            app:icon="@drawable/ic_home"
+            app:iconGravity="textStart" />
+
+        <TextView
+            android:id="@+id/tvLocationCoords"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="GPS no fijado aún (toca el botón para capturar)"
+            android:textColor="@color/textSecondary"
+            android:textSize="12sp" />
 
         <com.google.android.material.textfield.TextInputLayout
             style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:hint="Dirección completa y ciudad"
+            android:hint="Dirección completa de entrega"
             app:startIconDrawable="@drawable/ic_local_shipping">
 
             <com.google.android.material.textfield.TextInputEditText
@@ -124,7 +143,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
-            android:text="Selecciona el Método de Pago"
+            android:text="Selecciona la Pasarela o Método de Pago"
             android:textColor="@color/textPrimary"
             android:textSize="15sp"
             android:textStyle="bold" />
@@ -142,11 +161,20 @@
                 android:padding="12dp">
 
                 <RadioButton
-                    android:id="@+id/rbPse"
+                    android:id="@+id/rbEpayco"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:checked="true"
-                    android:text="PSE - Débito desde cuenta de ahorros / corriente"
+                    android:text="Pasarela ePayco (Tarjetas, PSE, Nequi, Daviplata, Efecty)"
+                    android:textSize="13sp"
+                    android:textStyle="bold" />
+
+                <RadioButton
+                    android:id="@+id/rbPse"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="PSE - Débito directo desde cuenta de ahorros"
                     android:textSize="13sp" />
 
                 <RadioButton
@@ -162,7 +190,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
-                    android:text="Nequi / Daviplata (Notificación push al celular)"
+                    android:text="Billetera Digital Nequi / Daviplata"
                     android:textSize="13sp" />
             </RadioGroup>
         </com.google.android.material.card.MaterialCardView>

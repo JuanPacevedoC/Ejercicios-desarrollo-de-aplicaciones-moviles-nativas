@@ -15,6 +15,7 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.ejerciciosprofundizacin.R
 import com.example.ejerciciosprofundizacin.data.AppDataRepository
+import com.example.ejerciciosprofundizacin.data.FirestoreRepository
 import com.example.ejerciciosprofundizacin.databinding.FragmentAdminUsersBinding
 import com.example.ejerciciosprofundizacin.model.User
 import com.example.ejerciciosprofundizacin.model.UserRole
@@ -44,6 +45,7 @@ class AdminUsersFragment : Fragment() {
 
         setupRecyclerView()
         setupSearchAndFilter()
+        loadUsersFromFirestore()
 
         binding.fabAddUser.setOnClickListener {
             showAddUserDialog()
@@ -55,9 +57,19 @@ class AdminUsersFragment : Fragment() {
             users = getFilteredUsers(),
             onEditClick = { user -> showEditUserDialog(user) },
             onToggleStatusClick = { user ->
+                val prevStatus = user.status
                 AppDataRepository.toggleUserStatus(user.id)
                 refreshList()
-                Toast.makeText(requireContext(), "Estado de ${user.name} actualizado: ${user.status}", Toast.LENGTH_SHORT).show()
+                FirestoreRepository.toggleUserStatus(
+                    userId = user.id,
+                    currentStatus = prevStatus,
+                    onSuccess = { newStatus ->
+                        Toast.makeText(requireContext(), "Estado en Firestore: $newStatus", Toast.LENGTH_SHORT).show()
+                    },
+                    onFailure = {
+                        Toast.makeText(requireContext(), "Estado local actualizado: ${user.status}", Toast.LENGTH_SHORT).show()
+                    }
+                )
             },
             onDeleteClick = { user ->
                 showDeleteConfirmationDialog(user)
@@ -65,6 +77,28 @@ class AdminUsersFragment : Fragment() {
         )
         binding.rvAdminUsers.layoutManager = LinearLayoutManager(requireContext())
         binding.rvAdminUsers.adapter = adapter
+    }
+
+    private fun loadUsersFromFirestore() {
+        FirestoreRepository.getUsers(
+            onSuccess = { firestoreUsers ->
+                if (firestoreUsers.isNotEmpty()) {
+                    // Sincronizar con AppDataRepository
+                    firestoreUsers.forEach { fUser ->
+                        val existing = AppDataRepository.getUsers().find { it.id == fUser.id }
+                        if (existing == null) {
+                            AppDataRepository.addUser(fUser)
+                        } else {
+                            AppDataRepository.updateUser(fUser)
+                        }
+                    }
+                    refreshList()
+                }
+            },
+            onFailure = {
+                // Si falla Firestore, mantiene los datos locales
+            }
+        )
     }
 
     private fun setupSearchAndFilter() {
@@ -140,8 +174,9 @@ class AdminUsersFragment : Fragment() {
                         rbVendor.id -> UserRole.VENDOR
                         else -> UserRole.BUYER
                     }
+                    val newUserId = "usr_" + UUID.randomUUID().toString().take(6)
                     val newUser = User(
-                        id = "usr_" + UUID.randomUUID().toString().take(6),
+                        id = newUserId,
                         name = name,
                         email = email,
                         role = role,
@@ -150,7 +185,18 @@ class AdminUsersFragment : Fragment() {
                     )
                     AppDataRepository.addUser(newUser)
                     refreshList()
-                    Toast.makeText(context, "Usuario creado exitosamente", Toast.LENGTH_SHORT).show()
+
+                    // Persistir en Firestore
+                    FirestoreRepository.createUserProfile(
+                        uid = newUserId,
+                        user = newUser,
+                        onSuccess = {
+                            Toast.makeText(context, "Usuario creado y persistido en Firestore", Toast.LENGTH_SHORT).show()
+                        },
+                        onFailure = {
+                            Toast.makeText(context, "Usuario creado localmente", Toast.LENGTH_SHORT).show()
+                        }
+                    )
                 } else {
                     Toast.makeText(context, "El nombre y el correo son obligatorios", Toast.LENGTH_SHORT).show()
                 }
@@ -183,7 +229,17 @@ class AdminUsersFragment : Fragment() {
                 user.address = etAddress.text.toString().trim()
                 AppDataRepository.updateUser(user)
                 refreshList()
-                Toast.makeText(context, "Usuario modificado correctamente", Toast.LENGTH_SHORT).show()
+
+                // Persistir en Firestore
+                FirestoreRepository.updateUser(
+                    user = user,
+                    onSuccess = {
+                        Toast.makeText(context, "Usuario actualizado en Firestore", Toast.LENGTH_SHORT).show()
+                    },
+                    onFailure = {
+                        Toast.makeText(context, "Modificado localmente", Toast.LENGTH_SHORT).show()
+                    }
+                )
             }
             .setNegativeButton("Cancelar", null)
             .show()
@@ -197,7 +253,17 @@ class AdminUsersFragment : Fragment() {
             .setPositiveButton("Eliminar") { _, _ ->
                 AppDataRepository.deleteUser(user.id)
                 refreshList()
-                Toast.makeText(requireContext(), "Usuario eliminado", Toast.LENGTH_SHORT).show()
+
+                // Persistir en Firestore
+                FirestoreRepository.deleteUser(
+                    userId = user.id,
+                    onSuccess = {
+                        Toast.makeText(requireContext(), "Usuario eliminado de Firestore", Toast.LENGTH_SHORT).show()
+                    },
+                    onFailure = {
+                        Toast.makeText(requireContext(), "Usuario eliminado localmente", Toast.LENGTH_SHORT).show()
+                    }
+                )
             }
             .setNegativeButton("Cancelar", null)
             .show()

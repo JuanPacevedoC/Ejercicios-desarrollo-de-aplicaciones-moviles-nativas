@@ -38,6 +38,11 @@ class BuyerProductAdapter(
             binding.tvProductPrice.text = AppDataRepository.formatCOP(product.price)
             binding.tvProductStock.text = "${product.stock} unidades disponibles"
 
+            com.example.ejerciciosprofundizacin.util.ImageUploadHelper.loadProductImage(
+                binding.ivProductIcon,
+                product.imageUrl
+            )
+
             binding.root.setOnClickListener { onProductClick(product) }
             binding.btnAddToCart.setOnClickListener { onAddToCartClick(product) }
         }

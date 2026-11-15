@@ -39,6 +39,26 @@ class BuyerCatalogFragment : Fragment() {
 
         setupRecyclerView()
         setupSearchAndFilters()
+        loadProductsFromFirestore()
+    }
+
+    private fun loadProductsFromFirestore() {
+        com.example.ejerciciosprofundizacin.data.FirestoreRepository.getProducts(
+            onSuccess = { firestoreProds ->
+                if (firestoreProds.isNotEmpty()) {
+                    firestoreProds.forEach { fProd ->
+                        val existing = AppDataRepository.getProductById(fProd.id)
+                        if (existing == null) {
+                            AppDataRepository.addProduct(fProd)
+                        } else {
+                            AppDataRepository.updateProduct(fProd)
+                        }
+                    }
+                    refreshList()
+                }
+            },
+            onFailure = {}
+        )
     }
 
     private fun setupRecyclerView() {

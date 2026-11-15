@@ -8,6 +8,7 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.ejerciciosprofundizacin.data.AppDataRepository
+import com.example.ejerciciosprofundizacin.data.FirestoreRepository
 import com.example.ejerciciosprofundizacin.databinding.FragmentVendorOrdersBinding
 import com.example.ejerciciosprofundizacin.model.OrderStatus
 import com.example.ejerciciosprofundizacin.ui.adapter.VendorOrdersAdapter
@@ -41,11 +42,34 @@ class VendorOrdersFragment : Fragment() {
                 }
                 AppDataRepository.updateOrderStatus(order.id, nextStatus)
                 adapter.updateData(AppDataRepository.getOrders())
-                Toast.makeText(requireContext(), "Orden #${order.orderNumber} actualizada a: ${nextStatus.label}", Toast.LENGTH_SHORT).show()
+
+                FirestoreRepository.updateOrderStatus(
+                    orderId = order.id,
+                    newStatus = nextStatus,
+                    onSuccess = {
+                        Toast.makeText(requireContext(), "Estado en Firestore: ${nextStatus.label}", Toast.LENGTH_SHORT).show()
+                    },
+                    onFailure = {
+                        Toast.makeText(requireContext(), "Orden #${order.orderNumber} actualizada a: ${nextStatus.label}", Toast.LENGTH_SHORT).show()
+                    }
+                )
             }
         )
         binding.rvVendorOrders.layoutManager = LinearLayoutManager(requireContext())
         binding.rvVendorOrders.adapter = adapter
+
+        loadOrdersFromFirestore()
+    }
+
+    private fun loadOrdersFromFirestore() {
+        FirestoreRepository.getOrders(
+            onSuccess = { orders ->
+                if (orders.isNotEmpty()) {
+                    adapter.updateData(orders)
+                }
+            },
+            onFailure = {}
+        )
     }
 
     override fun onDestroyView() {

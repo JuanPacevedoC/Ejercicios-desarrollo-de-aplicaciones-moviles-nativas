@@ -37,6 +37,11 @@ class AdminProductsAdapter(
             binding.tvAdminProductPrice.text = AppDataRepository.formatCOP(product.price)
             binding.tvAdminProductStock.text = "Stock: ${product.stock} unidades"
 
+            com.example.ejerciciosprofundizacin.util.ImageUploadHelper.loadProductImage(
+                binding.ivProductIcon,
+                product.imageUrl
+            )
+
             binding.btnAdminEditProduct.setOnClickListener { onEditClick(product) }
             binding.btnAdminDeleteProduct.setOnClickListener { onDeleteClick(product) }
         }

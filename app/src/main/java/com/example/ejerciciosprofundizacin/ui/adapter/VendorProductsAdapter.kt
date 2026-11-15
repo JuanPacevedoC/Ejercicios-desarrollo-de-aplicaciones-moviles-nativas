@@ -37,6 +37,11 @@ class VendorProductsAdapter(
             binding.tvVendorProductStock.text = "Disponibles: ${product.stock} unidades"
             binding.tvVendorProductWeight.text = product.weightCapacity
 
+            com.example.ejerciciosprofundizacin.util.ImageUploadHelper.loadProductImage(
+                binding.ivVendorProductIcon,
+                product.imageUrl
+            )
+
             binding.btnVendorEditProduct.setOnClickListener { onEditClick(product) }
             binding.btnVendorDeleteProduct.setOnClickListener { onDeleteClick(product) }
         }

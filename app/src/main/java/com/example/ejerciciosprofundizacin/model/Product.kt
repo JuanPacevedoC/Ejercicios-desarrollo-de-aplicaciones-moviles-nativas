@@ -11,5 +11,6 @@ data class Product(
     var dimensions: String,
     var weightCapacity: String,
     var sellerName: String,
-    var iconRes: Int = com.example.ejerciciosprofundizacin.R.drawable.ic_fitness_center
+    var iconRes: Int = com.example.ejerciciosprofundizacin.R.drawable.ic_fitness_center,
+    var imageUrl: String = ""
 )

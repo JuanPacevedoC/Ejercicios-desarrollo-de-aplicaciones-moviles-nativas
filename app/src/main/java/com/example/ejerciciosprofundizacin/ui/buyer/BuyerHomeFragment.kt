@@ -35,10 +35,30 @@ class BuyerHomeFragment : Fragment() {
 
         setupRecyclerView()
         setupCategoryChips()
+        loadProductsFromFirestore()
 
         binding.btnBannerExplore.setOnClickListener {
             (activity as? MainActivity)?.loadFragment(BuyerCatalogFragment(), "Catálogo FitMarket")
         }
+    }
+
+    private fun loadProductsFromFirestore() {
+        com.example.ejerciciosprofundizacin.data.FirestoreRepository.getProducts(
+            onSuccess = { firestoreProds ->
+                if (firestoreProds.isNotEmpty()) {
+                    firestoreProds.forEach { fProd ->
+                        val existing = AppDataRepository.getProductById(fProd.id)
+                        if (existing == null) {
+                            AppDataRepository.addProduct(fProd)
+                        } else {
+                            AppDataRepository.updateProduct(fProd)
+                        }
+                    }
+                    adapter.updateData(getFilteredProducts())
+                }
+            },
+            onFailure = {}
+        )
     }
 
     private fun setupRecyclerView() {

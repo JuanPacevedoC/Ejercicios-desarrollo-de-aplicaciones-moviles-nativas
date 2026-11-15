@@ -221,16 +221,37 @@ El proyecto da respuesta directa a los requerimientos de completitud de la **Act
 ## 🛠 Pila Tecnológica y Dependencias
 
 * **Lenguaje:** Kotlin 2.0+
-* **Plataforma:** Android SDK (minSdk 24, targetSdk 36)
-* **Herramienta de Construcción:** Gradle 8.9 con Android Gradle Plugin (AGP) 8.7.3
-* **Librerías Clave:**
-  * `androidx.core:core-ktx:1.15.0`
-  * `androidx.appcompat:appcompat:1.7.0`
-  * `com.google.android.material:material:1.12.0`
-  * `androidx.biometric:biometric:1.2.0-alpha05` (Autenticación Biométrica)
+* **Plataforma:** Android SDK (minSdk 30, targetSdk 37)
+* **Herramienta de Construcción:** Gradle 8.9+ con Android Gradle Plugin (AGP) 9.5.0
+* **Bases de Datos & Backend:**
+  * `com.google.firebase:firebase-auth-ktx` (Autenticación de Usuarios)
+  * `com.google.firebase:firebase-firestore-ktx` (Base de Datos NoSQL Cloud Firestore)
+  * `com.google.firebase:firebase-storage-ktx` (Almacenamiento de fotos en la nube)
+* **Geolocalización & APIs de Google:**
+  * `com.google.android.gms:play-services-location:21.3.0` (FusedLocationProviderClient + Geocoder)
+* **Carga de Imágenes:**
+  * `com.github.bumptech.glide:glide:4.16.0`
+* **Librerías UI y AndroidX:**
+  * `com.google.android.material:material:1.10.0` (Material 3)
+  * `androidx.biometric:biometric:1.2.0-alpha05` (Autenticación Biométrica por huella)
   * `androidx.fragment:fragment-ktx:1.8.5` (Gestión avanzada de Fragments)
   * `androidx.recyclerview:recyclerview:1.3.2` (Listados optimizados)
-  * `androidx.cardview:cardview:1.0.0` (Tarjetas de contenido elevado)
+  * `androidx.activity:activity-ktx:1.13.0`
+
+---
+
+## 🎯 Cumplimiento de Requerimientos — Actividad 3 / Proyecto Final
+
+| Componente Solicitado | Implementación Técnica | Ubicación en Código |
+| :--- | :--- | :--- |
+| **Autenticación Multi-rol** | Registro (`RegisterActivity`), Login (`LoginActivity`), Recuperación (`ForgotPasswordActivity`) y Cierre de sesión con `FirebaseAuth`. Soporte para 3 roles (ADMIN, VENDOR, BUYER). | [`RegisterActivity.kt`](file:///C:/Users/juanp/AndroidStudioProjects/Ejerciciosprofundizacin/app/src/main/java/com/example/ejerciciosprofundizacin/ui/auth/RegisterActivity.kt), [`LoginActivity.kt`](file:///C:/Users/juanp/AndroidStudioProjects/Ejerciciosprofundizacin/app/src/main/java/com/example/ejerciciosprofundizacin/ui/auth/LoginActivity.kt) |
+| **Autenticación Biométrica** | `BiometricPrompt` nativo con validación de huella dactilar y fallback dialog para emuladores. | [`LoginActivity.kt`](file:///C:/Users/juanp/AndroidStudioProjects/Ejerciciosprofundizacin/app/src/main/java/com/example/ejerciciosprofundizacin/ui/auth/LoginActivity.kt) |
+| **CRUD de Usuarios en Firestore** | Creación, lectura, edición, suspensión/activación y eliminación de usuarios por el Administrador sincronizado en Cloud Firestore. | [`AdminUsersFragment.kt`](file:///C:/Users/juanp/AndroidStudioProjects/Ejerciciosprofundizacin/app/src/main/java/com/example/ejerciciosprofundizacin/ui/admin/AdminUsersFragment.kt), [`FirestoreRepository.kt`](file:///C:/Users/juanp/AndroidStudioProjects/Ejerciciosprofundizacin/app/src/main/java/com/example/ejerciciosprofundizacin/data/FirestoreRepository.kt) |
+| **CRUD de Productos + Storage** | Publicación, edición y borrado de productos con captura desde Cámara o Galería y subida a Firebase Storage. | [`AdminProductsFragment.kt`](file:///C:/Users/juanp/AndroidStudioProjects/Ejerciciosprofundizacin/app/src/main/java/com/example/ejerciciosprofundizacin/ui/admin/AdminProductsFragment.kt), [`VendorProductsFragment.kt`](file:///C:/Users/juanp/AndroidStudioProjects/Ejerciciosprofundizacin/app/src/main/java/com/example/ejerciciosprofundizacin/ui/vendor/VendorProductsFragment.kt), [`ImageUploadHelper.kt`](file:///C:/Users/juanp/AndroidStudioProjects/Ejerciciosprofundizacin/app/src/main/java/com/example/ejerciciosprofundizacin/util/ImageUploadHelper.kt) |
+| **CRUD de Carrito y Órdenes** | Carrito dinámico, actualización de existencias, creación de pedidos y persistencia de historial de órdenes en Firestore. | [`BuyerCartFragment.kt`](file:///C:/Users/juanp/AndroidStudioProjects/Ejerciciosprofundizacin/app/src/main/java/com/example/ejerciciosprofundizacin/ui/buyer/BuyerCartFragment.kt), [`BuyerCheckoutFragment.kt`](file:///C:/Users/juanp/AndroidStudioProjects/Ejerciciosprofundizacin/app/src/main/java/com/example/ejerciciosprofundizacin/ui/buyer/BuyerCheckoutFragment.kt), [`VendorOrdersFragment.kt`](file:///C:/Users/juanp/AndroidStudioProjects/Ejerciciosprofundizacin/app/src/main/java/com/example/ejerciciosprofundizacin/ui/vendor/VendorOrdersFragment.kt) |
+| **Geolocalización (GPS)** | Captura de coordenadas GPS con `FusedLocationProviderClient`, geocodificación inversa con `Geocoder` y asociación a la dirección de entrega. | [`BuyerCheckoutFragment.kt`](file:///C:/Users/juanp/AndroidStudioProjects/Ejerciciosprofundizacin/app/src/main/java/com/example/ejerciciosprofundizacin/ui/buyer/BuyerCheckoutFragment.kt) |
+| **Pasarela de Pagos (ePayco)** | Integración certificada con ePayco, generación de referencia de pago (`EPY-XXXXXXXX`), código de autorización y confirmación de transacción con comprobante digital bajo Ley 527 de 1999. | [`BuyerCheckoutFragment.kt`](file:///C:/Users/juanp/AndroidStudioProjects/Ejerciciosprofundizacin/app/src/main/java/com/example/ejerciciosprofundizacin/ui/buyer/BuyerCheckoutFragment.kt) |
+| **Despliegues en Git** | Control de versiones completo con ramas, historial de commits trazable y estructura estandarizada. | Repositorio Git del proyecto |
 
 ---
 

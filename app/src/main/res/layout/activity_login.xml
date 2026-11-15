@@ -200,12 +200,27 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/btnLogin" />
 
+        <!-- Register Link -->
+        <TextView
+            android:id="@+id/tvGoToRegister"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:padding="8dp"
+            android:text="¿No tienes cuenta? Regístrate aquí"
+            android:textColor="@color/primary"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/btnBiometric" />
+
         <!-- Legal Notice Ley 1581 de 2012 -->
         <TextView
             android:id="@+id/tvLegalNotice"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
+            android:layout_marginTop="20dp"
             android:layout_marginBottom="16dp"
             android:text="Al continuar declaras conocer la Política de Privacidad y Tratamiento de Datos Personales (Ley 1581 de 2012 Habeas Data) y Términos y Condiciones (Ley 1480 de 2011)."
             android:textAlignment="center"
@@ -214,7 +229,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/btnBiometric"
+            app:layout_constraintTop_toBottomOf="@+id/tvGoToRegister"
             app:layout_constraintVertical_bias="1.0" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,22 +1,30 @@
 package com.example.ejerciciosprofundizacin.ui.admin
 
+import android.net.Uri
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
+import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.ejerciciosprofundizacin.R
 import com.example.ejerciciosprofundizacin.data.AppDataRepository
+import com.example.ejerciciosprofundizacin.data.FirestoreRepository
 import com.example.ejerciciosprofundizacin.databinding.FragmentAdminProductsBinding
 import com.example.ejerciciosprofundizacin.model.Product
 import com.example.ejerciciosprofundizacin.ui.adapter.AdminProductsAdapter
+import com.example.ejerciciosprofundizacin.util.ImageUploadHelper
+import java.io.File
 import java.util.UUID
 
 class AdminProductsFragment : Fragment() {
@@ -25,6 +33,25 @@ class AdminProductsFragment : Fragment() {
     private val binding get() = _binding!!
     private lateinit var adapter: AdminProductsAdapter
     private var searchQuery: String = ""
+
+    // Variables para captura y carga de fotos
+    private var tempCameraUri: Uri? = null
+    private var currentUploadedImageUrl: String = ""
+    private var ivDialogPreview: ImageView? = null
+
+    // Launcher para Galería
+    private val pickGalleryLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+        uri?.let {
+            handleImageSelected(it)
+        }
+    }
+
+    // Launcher para Cámara
+    private val takeCameraLauncher = registerForActivityResult(ActivityResultContracts.TakePicture()) { success: Boolean ->
+        if (success && tempCameraUri != null) {
+            handleImageSelected(tempCameraUri!!)
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -40,6 +67,7 @@ class AdminProductsFragment : Fragment() {
 
         setupRecyclerView()
         setupSearch()
+        loadProductsFromFirestore()
 
         binding.fabAdminAddProduct.setOnClickListener {
             showAddProductDialog()
@@ -54,6 +82,27 @@ class AdminProductsFragment : Fragment() {
         )
         binding.rvAdminProducts.layoutManager = LinearLayoutManager(requireContext())
         binding.rvAdminProducts.adapter = adapter
+    }
+
+    private fun loadProductsFromFirestore() {
+        FirestoreRepository.getProducts(
+            onSuccess = { firestoreProds ->
+                if (firestoreProds.isNotEmpty()) {
+                    firestoreProds.forEach { fProd ->
+                        val existing = AppDataRepository.getProductById(fProd.id)
+                        if (existing == null) {
+                            AppDataRepository.addProduct(fProd)
+                        } else {
+                            AppDataRepository.updateProduct(fProd)
+                        }
+                    }
+                    refreshList()
+                }
+            },
+            onFailure = {
+                // Fallback a productos locales
+            }
+        )
     }
 
     private fun setupSearch() {
@@ -82,6 +131,8 @@ class AdminProductsFragment : Fragment() {
 
     private fun showAddProductDialog() {
         val context = requireContext()
+        currentUploadedImageUrl = ""
+
         val layout = LinearLayout(context).apply {
             orientation = LinearLayout.VERTICAL
             setPadding(48, 24, 48, 16)
@@ -94,12 +145,31 @@ class AdminProductsFragment : Fragment() {
         val etMaterial = EditText(context).apply { hint = "Material (ej. Acero al carbono)" }
         val etSeller = EditText(context).apply { hint = "Nombre del vendedor / Tienda" }
 
+        // Botón y preview de imagen
+        val btnAttachImage = Button(context).apply {
+            text = "📷 Adjuntar Foto (Cámara / Galería)"
+            setOnClickListener {
+                showImageSourceDialog()
+            }
+        }
+
+        ivDialogPreview = ImageView(context).apply {
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                300
+            ).apply { topMargin = 16 }
+            visibility = View.GONE
+            scaleType = ImageView.ScaleType.CENTER_CROP
+        }
+
         layout.addView(etName)
         layout.addView(etCategory)
         layout.addView(etPrice)
         layout.addView(etStock)
         layout.addView(etMaterial)
         layout.addView(etSeller)
+        layout.addView(btnAttachImage)
+        layout.addView(ivDialogPreview)
 
         AlertDialog.Builder(context)
             .setTitle("Nuevo Producto Deportivo")
@@ -120,19 +190,77 @@ class AdminProductsFragment : Fragment() {
                         dimensions = "Estándar oficial",
                         weightCapacity = "Soporta hasta 200 kg",
                         sellerName = etSeller.text.toString().trim().ifEmpty { "FitMarket Oficial" },
+                        imageUrl = currentUploadedImageUrl,
                         iconRes = R.drawable.ic_fitness_center
                     )
                     AppDataRepository.addProduct(newProd)
                     refreshList()
-                    Toast.makeText(context, "Producto publicado con éxito", Toast.LENGTH_SHORT).show()
+
+                    // Persistir en Firestore
+                    FirestoreRepository.addProduct(
+                        product = newProd,
+                        onSuccess = {
+                            Toast.makeText(context, "Producto guardado y persistido en Firestore", Toast.LENGTH_SHORT).show()
+                        },
+                        onFailure = {
+                            Toast.makeText(context, "Producto publicado localmente", Toast.LENGTH_SHORT).show()
+                        }
+                    )
                 }
             }
             .setNegativeButton("Cancelar", null)
             .show()
     }
 
+    private fun showImageSourceDialog() {
+        val options = arrayOf("📸 Tomar Foto con Cámara", "🖼️ Seleccionar de Galería")
+        AlertDialog.Builder(requireContext())
+            .setTitle("Subir Foto del Producto")
+            .setItems(options) { _, which ->
+                when (which) {
+                    0 -> openCamera()
+                    1 -> pickGalleryLauncher.launch("image/*")
+                }
+            }
+            .show()
+    }
+
+    private fun openCamera() {
+        val context = requireContext()
+        val tempFile = ImageUploadHelper.createTempImageFile(context)
+        tempCameraUri = FileProvider.getUriForFile(
+            context,
+            "${context.packageName}.fileprovider",
+            tempFile
+        )
+        tempCameraUri?.let { takeCameraLauncher.launch(it) }
+    }
+
+    private fun handleImageSelected(uri: Uri) {
+        ivDialogPreview?.let { preview ->
+            preview.visibility = View.VISIBLE
+            preview.setImageURI(uri)
+        }
+        Toast.makeText(requireContext(), "Subiendo imagen a Firebase Storage...", Toast.LENGTH_SHORT).show()
+
+        ImageUploadHelper.uploadImageToFirebase(
+            imageUri = uri,
+            onSuccess = { downloadUrl ->
+                currentUploadedImageUrl = downloadUrl
+                Toast.makeText(requireContext(), "¡Imagen almacenada exitosamente en Firebase Storage!", Toast.LENGTH_SHORT).show()
+            },
+            onFailure = {
+                // Si Firebase Storage falla sin google-services.json, mantener uri local
+                currentUploadedImageUrl = uri.toString()
+                Toast.makeText(requireContext(), "Imagen vinculada localmente", Toast.LENGTH_SHORT).show()
+            }
+        )
+    }
+
     private fun showEditProductDialog(product: Product) {
         val context = requireContext()
+        currentUploadedImageUrl = product.imageUrl
+
         val layout = LinearLayout(context).apply {
             orientation = LinearLayout.VERTICAL
             setPadding(48, 24, 48, 16)
@@ -143,10 +271,23 @@ class AdminProductsFragment : Fragment() {
         val etStock = EditText(context).apply { setText(product.stock.toString()); hint = "Stock" }
         val etMaterial = EditText(context).apply { setText(product.material); hint = "Material" }
 
+        val btnChangeImage = Button(context).apply {
+            text = "📷 Cambiar Foto (Cámara / Galería)"
+            setOnClickListener { showImageSourceDialog() }
+        }
+
+        ivDialogPreview = ImageView(context).apply {
+            layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 300).apply { topMargin = 16 }
+            visibility = if (product.imageUrl.isNotEmpty()) View.VISIBLE else View.GONE
+            ImageUploadHelper.loadProductImage(this, product.imageUrl)
+        }
+
         layout.addView(etName)
         layout.addView(etPrice)
         layout.addView(etStock)
         layout.addView(etMaterial)
+        layout.addView(btnChangeImage)
+        layout.addView(ivDialogPreview)
 
         AlertDialog.Builder(context)
             .setTitle("Editar: ${product.name}")
@@ -156,9 +297,20 @@ class AdminProductsFragment : Fragment() {
                 product.price = etPrice.text.toString().toDoubleOrNull() ?: product.price
                 product.stock = etStock.text.toString().toIntOrNull() ?: product.stock
                 product.material = etMaterial.text.toString().trim()
+                product.imageUrl = currentUploadedImageUrl
                 AppDataRepository.updateProduct(product)
                 refreshList()
-                Toast.makeText(context, "Producto modificado correctamente", Toast.LENGTH_SHORT).show()
+
+                // Persistir en Firestore
+                FirestoreRepository.updateProduct(
+                    product = product,
+                    onSuccess = {
+                        Toast.makeText(context, "Producto actualizado en Firestore", Toast.LENGTH_SHORT).show()
+                    },
+                    onFailure = {
+                        Toast.makeText(context, "Producto actualizado localmente", Toast.LENGTH_SHORT).show()
+                    }
+                )
             }
             .setNegativeButton("Cancelar", null)
             .show()
@@ -172,7 +324,17 @@ class AdminProductsFragment : Fragment() {
             .setPositiveButton("Eliminar") { _, _ ->
                 AppDataRepository.deleteProduct(product.id)
                 refreshList()
-                Toast.makeText(requireContext(), "Producto eliminado", Toast.LENGTH_SHORT).show()
+
+                // Persistir en Firestore
+                FirestoreRepository.deleteProduct(
+                    productId = product.id,
+                    onSuccess = {
+                        Toast.makeText(requireContext(), "Producto eliminado de Firestore", Toast.LENGTH_SHORT).show()
+                    },
+                    onFailure = {
+                        Toast.makeText(requireContext(), "Producto eliminado localmente", Toast.LENGTH_SHORT).show()
+                    }
+                )
             }
             .setNegativeButton("Cancelar", null)
             .show()

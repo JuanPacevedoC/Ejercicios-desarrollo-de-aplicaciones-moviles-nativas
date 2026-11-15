@@ -95,6 +95,11 @@ class BuyerProductDetailFragment : Fragment() {
         binding.tvDetailDimensions.text = "• Dimensiones: ${p.dimensions}"
         binding.tvDetailWeightCapacity.text = "• Resistencia: ${p.weightCapacity}"
         binding.tvDetailQuantity.text = quantity.toString()
+
+        com.example.ejerciciosprofundizacin.util.ImageUploadHelper.loadProductImage(
+            binding.ivDetailIcon,
+            p.imageUrl
+        )
     }
 
     override fun onDestroyView() {

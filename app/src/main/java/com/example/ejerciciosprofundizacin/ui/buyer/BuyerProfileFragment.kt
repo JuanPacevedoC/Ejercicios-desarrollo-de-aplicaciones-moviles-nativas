@@ -86,7 +86,18 @@ class BuyerProfileFragment : Fragment() {
     }
 
     private fun showMyOrdersDialog() {
-        val orders = AppDataRepository.getOrders()
+        com.example.ejerciciosprofundizacin.data.FirestoreRepository.getOrders(
+            onSuccess = { firestoreOrders ->
+                val displayOrders = if (firestoreOrders.isNotEmpty()) firestoreOrders else AppDataRepository.getOrders()
+                renderOrdersDialog(displayOrders)
+            },
+            onFailure = {
+                renderOrdersDialog(AppDataRepository.getOrders())
+            }
+        )
+    }
+
+    private fun renderOrdersDialog(orders: List<com.example.ejerciciosprofundizacin.model.Order>) {
         val itemsList = if (orders.isEmpty()) {
             "Aún no has realizado compras en la tienda."
         } else {

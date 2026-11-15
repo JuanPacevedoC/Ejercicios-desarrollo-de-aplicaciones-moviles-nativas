@@ -11,8 +11,11 @@ import androidx.core.content.ContextCompat
 import com.example.ejerciciosprofundizacin.MainActivity
 import com.example.ejerciciosprofundizacin.R
 import com.example.ejerciciosprofundizacin.data.AppDataRepository
+import com.example.ejerciciosprofundizacin.data.FirestoreRepository
 import com.example.ejerciciosprofundizacin.databinding.ActivityLoginBinding
+import com.example.ejerciciosprofundizacin.model.User
 import com.example.ejerciciosprofundizacin.model.UserRole
+import com.google.firebase.auth.FirebaseAuth
 import java.util.concurrent.Executor
 
 class LoginActivity : AppCompatActivity() {
@@ -22,6 +25,7 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var biometricPrompt: BiometricPrompt
     private lateinit var promptInfo: BiometricPrompt.PromptInfo
 
+    private val auth: FirebaseAuth by lazy { FirebaseAuth.getInstance() }
     private var selectedRole: UserRole = UserRole.BUYER
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -34,6 +38,10 @@ class LoginActivity : AppCompatActivity() {
 
         binding.tvForgotPassword.setOnClickListener {
             startActivity(Intent(this, ForgotPasswordActivity::class.java))
+        }
+
+        binding.tvGoToRegister.setOnClickListener {
+            startActivity(Intent(this, RegisterActivity::class.java))
         }
 
         binding.btnLogin.setOnClickListener {
@@ -69,7 +77,6 @@ class LoginActivity : AppCompatActivity() {
         biometricPrompt = BiometricPrompt(this, executor, object : BiometricPrompt.AuthenticationCallback() {
             override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
                 super.onAuthenticationError(errorCode, errString)
-                // Si el dispositivo/emulador no tiene biometría configurada, permitir acceso guiado
                 if (errorCode == BiometricPrompt.ERROR_NO_BIOMETRICS ||
                     errorCode == BiometricPrompt.ERROR_HW_NOT_PRESENT ||
                     errorCode == BiometricPrompt.ERROR_HW_UNAVAILABLE
@@ -120,7 +127,7 @@ class LoginActivity : AppCompatActivity() {
     private fun showBiometricFallbackDialog() {
         AlertDialog.Builder(this)
             .setTitle("Simulación Biométrica")
-            .setMessage("El hardware biométrico no está enrolado en este dispositivo/emulador.\n\n¿Deseas simular la validación dactilar exitosa para el rol '${selectedRole.displayName}'?")
+            .setMessage("El hardware biométrico no está enrolado en este dispositivo/emulador.\n\n¿Deseas validar acceso dactilar para el rol '${selectedRole.displayName}'?")
             .setIcon(R.drawable.ic_fingerprint)
             .setPositiveButton("Simular Huella OK") { _, _ ->
                 Toast.makeText(this, "Huella verificada correctamente", Toast.LENGTH_SHORT).show()
@@ -145,13 +152,61 @@ class LoginActivity : AppCompatActivity() {
         binding.tilEmail.error = null
         binding.tilPassword.error = null
 
-        loginSuccess()
+        binding.btnLogin.isEnabled = false
+        binding.btnLogin.text = "Validando..."
+
+        // Intentar autenticación con Firebase Auth
+        auth.signInWithEmailAndPassword(email, password)
+            .addOnCompleteListener(this) { task ->
+                binding.btnLogin.isEnabled = true
+                binding.btnLogin.text = "Iniciar Sesión"
+
+                if (task.isSuccessful) {
+                    val uid = auth.currentUser?.uid ?: ""
+                    // Cargar perfil desde Firestore
+                    FirestoreRepository.loadCurrentUserProfile(
+                        uid = uid,
+                        onSuccess = { user ->
+                            AppDataRepository.currentUser = user
+                            AppDataRepository.setRole(user.role)
+                            Toast.makeText(this, "Bienvenido: ${user.name} (${user.role.displayName})", Toast.LENGTH_SHORT).show()
+                            navigateToMain()
+                        },
+                        onFailure = {
+                            // Fallback al rol seleccionado si Firestore no tiene el documento
+                            loginSuccess()
+                        }
+                    )
+                } else {
+                    // Si falla Firebase Auth (por credenciales o falta de google-services.json),
+                    // permitir ingresar con el rol seleccionado si coinciden con los de demo
+                    val isDemoAccount = email in listOf(
+                        "jpabloacevedo@ucompensar.edu.co",
+                        "vendedor@irongrip.co",
+                        "admin@fitmarket.com"
+                    )
+
+                    if (isDemoAccount) {
+                        Toast.makeText(this, "Acceso concedido vía perfil de demostración (${selectedRole.displayName})", Toast.LENGTH_SHORT).show()
+                        loginSuccess()
+                    } else {
+                        Toast.makeText(this, "Error de inicio de sesión: ${task.exception?.localizedMessage}", Toast.LENGTH_LONG).show()
+                    }
+                }
+            }
     }
 
     private fun loginSuccess() {
         AppDataRepository.setRole(selectedRole)
+        FirestoreRepository.currentRole = selectedRole
+        FirestoreRepository.currentUser = AppDataRepository.currentUser
         Toast.makeText(this, "Bienvenido: ${AppDataRepository.currentUser.name} (${selectedRole.displayName})", Toast.LENGTH_LONG).show()
+        navigateToMain()
+    }
+
+    private fun navigateToMain() {
         val intent = Intent(this, MainActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         startActivity(intent)
         finish()
     }
