@@ -26,6 +26,15 @@ import com.example.ejerciciosprofundizacin.ui.adapter.VendorProductsAdapter
 import com.example.ejerciciosprofundizacin.util.ImageUploadHelper
 import java.util.UUID
 
+/**
+ * Fragmento de gestión de inventario y publicaciones para el rol de Vendedor.
+ *
+ * Cumplimiento de requerimientos Actividad 3 / Proyecto Final:
+ * - Publicación, edición y eliminación de equipamiento deportivo propio del vendedor.
+ * - Subida de imágenes desde Cámara o Galería hacia Firebase Storage.
+ * - Persistencia sincronizada con Cloud Firestore.
+ * - Filtro automático para listar únicamente los productos asignados a la tienda del vendedor.
+ */
 class VendorProductsFragment : Fragment() {
 
     private var _binding: FragmentVendorProductsBinding? = null

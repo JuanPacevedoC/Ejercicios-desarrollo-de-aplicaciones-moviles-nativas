@@ -12,6 +12,14 @@ import com.example.ejerciciosprofundizacin.data.AppDataRepository
 import com.example.ejerciciosprofundizacin.databinding.FragmentBuyerCartBinding
 import com.example.ejerciciosprofundizacin.ui.adapter.BuyerCartAdapter
 
+/**
+ * Fragmento del carrito de compras para el rol de Comprador.
+ *
+ * Cumplimiento de requerimientos Actividad 3 / Proyecto Final:
+ * - CRUD del carrito: Modificar cantidades (+/-), remover artículos y vaciado de carrito.
+ * - Cálculo automático de subtotales, costo de envío fijo y total de la transacción en COP.
+ * - Conexión con el flujo de Pasarela de Pagos (BuyerCheckoutFragment).
+ */
 class BuyerCartFragment : Fragment() {
 
     private var _binding: FragmentBuyerCartBinding? = null

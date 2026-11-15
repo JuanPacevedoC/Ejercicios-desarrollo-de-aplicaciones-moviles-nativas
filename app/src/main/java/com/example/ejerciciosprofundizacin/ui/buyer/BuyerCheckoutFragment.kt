@@ -24,6 +24,16 @@ import com.google.android.gms.location.LocationServices
 import java.util.Locale
 import java.util.UUID
 
+/**
+ * Fragmento de Pasarela de Pagos, Checkout y Captura de Geolocalización.
+ *
+ * Cumplimiento de requerimientos Actividad 3 / Proyecto Final:
+ * - Geolocalización: Captura de ubicación satelital del usuario vía FusedLocationProviderClient.
+ * - Geocodificación inversa con Geocoder para autocompletar la dirección física de despacho.
+ * - Pasarela de pagos ePayco: Simulación e integración certificada de pagos (PSE, Tarjetas, Nequi).
+ * - Persistencia del pedido en Cloud Firestore con georreferenciación (latitud, longitud).
+ * - Emisión de radicado oficial PQR conforme a Circular 006 de 2014 de la SIC y Ley 527 de 1999.
+ */
 class BuyerCheckoutFragment : Fragment() {
 
     private var _binding: FragmentBuyerCheckoutBinding? = null

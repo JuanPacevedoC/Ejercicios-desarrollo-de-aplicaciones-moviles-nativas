@@ -28,6 +28,16 @@ import com.example.ejerciciosprofundizacin.ui.vendor.VendorOrdersFragment
 import com.example.ejerciciosprofundizacin.ui.vendor.VendorProductsFragment
 import com.example.ejerciciosprofundizacin.ui.vendor.VendorProfileFragment
 
+/**
+ * Actividad contenedora principal de la arquitectura móvil de FitMarket Calisthenics.
+ *
+ * Implementa una arquitectura desacoplada basada en Single Activity y múltiples Fragments:
+ * - Soporte adaptativo para tres roles de usuario (ADMIN, VENDOR, BUYER).
+ * - Menú lateral dinámico (NavigationDrawer) personalizado según los privilegios del rol activo.
+ * - Barra de navegación inferior (BottomNavigationView) contextualizada.
+ * - Gestión de pila de fragmentos y botón atrás mediante OnBackPressedCallback.
+ * - Sincronización del estado global de la sesión y cierre de sesión seguro con Firebase Auth.
+ */
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding

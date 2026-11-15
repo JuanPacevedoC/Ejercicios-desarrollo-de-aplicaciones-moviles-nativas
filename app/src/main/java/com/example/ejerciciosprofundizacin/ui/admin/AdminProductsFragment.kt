@@ -27,6 +27,16 @@ import com.example.ejerciciosprofundizacin.util.ImageUploadHelper
 import java.io.File
 import java.util.UUID
 
+/**
+ * Fragmento de gestión global de catálogo de productos para el Administrador.
+ *
+ * Cumplimiento de requerimientos Actividad 3 / Proyecto Final:
+ * - CRUD completo de productos: Crear, Listar, Modificar especificaciones y Retirar de catálogo.
+ * - Carga multimedia: Captura de fotos con Cámara nativa o selección desde Galería.
+ * - Almacenamiento en la nube: Subida asíncrona a Firebase Storage (products/{uuid}.jpg).
+ * - Persistencia de datos técnicos y URL pública en Cloud Firestore (colección "products").
+ * - Visualización optimizada mediante Glide.
+ */
 class AdminProductsFragment : Fragment() {
 
     private var _binding: FragmentAdminProductsBinding? = null

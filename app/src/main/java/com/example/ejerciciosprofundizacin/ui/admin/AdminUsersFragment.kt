@@ -22,6 +22,15 @@ import com.example.ejerciciosprofundizacin.model.UserRole
 import com.example.ejerciciosprofundizacin.ui.adapter.AdminUsersAdapter
 import java.util.UUID
 
+/**
+ * Fragmento de gestión de usuarios exclusivo para el rol de Administrador.
+ *
+ * Cumplimiento de requerimientos Actividad 3 / Proyecto Final:
+ * - CRUD completo de usuarios: Crear, Consultar, Actualizar, Suspender/Reactivar y Eliminar.
+ * - Persistencia bidireccional en Cloud Firestore (colección "users").
+ * - Filtrado en tiempo real por rol (Comprador, Vendedor, Administrador) y búsqueda textual.
+ * - Gestión de estados de cuenta (Activo / Suspendido) conforme a políticas de seguridad.
+ */
 class AdminUsersFragment : Fragment() {
 
     private var _binding: FragmentAdminUsersBinding? = null

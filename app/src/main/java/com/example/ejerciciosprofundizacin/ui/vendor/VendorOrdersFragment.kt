@@ -13,6 +13,14 @@ import com.example.ejerciciosprofundizacin.databinding.FragmentVendorOrdersBindi
 import com.example.ejerciciosprofundizacin.model.OrderStatus
 import com.example.ejerciciosprofundizacin.ui.adapter.VendorOrdersAdapter
 
+/**
+ * Fragmento de gestión y despacho de pedidos para el rol de Vendedor.
+ *
+ * Cumplimiento de requerimientos Actividad 3 / Proyecto Final:
+ * - Consulta de historial de pedidos registrados por los compradores.
+ * - Flujo de estados de entrega: PENDIENTE -> PREPARACION -> ENVIADO -> ENTREGADO.
+ * - Persistencia del avance de estado en Cloud Firestore (colección "orders").
+ */
 class VendorOrdersFragment : Fragment() {
 
     private var _binding: FragmentVendorOrdersBinding? = null

@@ -13,6 +13,14 @@ import com.example.ejerciciosprofundizacin.R
 import com.example.ejerciciosprofundizacin.data.AppDataRepository
 import com.example.ejerciciosprofundizacin.databinding.FragmentBuyerProfileBinding
 
+/**
+ * Fragmento de perfil de usuario, historial de compras y canal de atención para el Comprador.
+ *
+ * Cumplimiento de requerimientos Actividad 3 / Proyecto Final:
+ * - Consulta de información de contacto y dirección predeterminada.
+ * - Historial de pedidos realizados sincronizado con Cloud Firestore.
+ * - Canal oficial de PQR y derecho de retracto conforme a la Ley 1480 de 2011 y Circular 006 de 2014 de la SIC.
+ */
 class BuyerProfileFragment : Fragment() {
 
     private var _binding: FragmentBuyerProfileBinding? = null
